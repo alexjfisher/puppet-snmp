@@ -399,12 +399,6 @@ class snmp (
     $trapdrun = 'no'
   }
 
-  if $::osfamily != 'Debian' {
-    $snmptrapd_conf_notify = Service['snmptrapd']
-  } else {
-    $snmptrapd_conf_notify = Service['snmpd']
-  }
-
   if $manage_client {
     class { 'snmp::client':
       ensure      => $ensure,
@@ -469,7 +463,6 @@ class snmp (
     path    => $snmp::params::trap_service_config,
     content => template($template_snmptrapd),
     require => Package['snmpd'],
-    notify  => $snmptrapd_conf_notify,
   }
 
   if $::osfamily == 'RedHat' {
@@ -491,6 +484,7 @@ class snmp (
       hasstatus  => $trap_service_hasstatus,
       hasrestart => $trap_service_hasrestart,
       require    => [ Package['snmpd'], File['var-net-snmp'], ],
+      subscribe  => File['snmptrapd.conf'],
     }
   } elsif $::osfamily == 'Suse' {
     exec { 'install /etc/init.d/snmptrapd':
@@ -510,6 +504,7 @@ class snmp (
         File['var-net-snmp'],
         Exec['install /etc/init.d/snmptrapd'],
       ],
+      subscribe  => File['snmptrapd.conf'],
     }
   } elsif $::osfamily == 'FreeBSD'  or $::osfamily == 'OpenBSD' {
     service { 'snmptrapd':
@@ -522,6 +517,7 @@ class snmp (
         Package['snmpd'],
         File['var-net-snmp'],
       ],
+      subscribe  => File['snmptrapd.conf'],
     }
   }
 
@@ -532,5 +528,9 @@ class snmp (
     hasstatus  => $service_hasstatus,
     hasrestart => $service_hasrestart,
     require    => [ Package['snmpd'], File['var-net-snmp'], ],
+  }
+
+  if $::osfamily == 'Debian' {
+    File['snmptrapd.conf'] ~> Service['snmpd']
   }
 }
