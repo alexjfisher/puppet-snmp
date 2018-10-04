@@ -448,7 +448,7 @@ class snmp (
     notify  => Service['snmpd'],
   }
 
-  if $::osfamily != 'FreeBSD' and $::osfamily != 'OpenBSD' {
+  unless $::osfamily == 'FreeBSD' or $::osfamily == 'OpenBSD' {
     file { 'snmpd.sysconfig':
       ensure  => $file_ensure,
       mode    => '0644',
