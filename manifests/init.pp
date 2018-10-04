@@ -483,7 +483,10 @@ class snmp (
       enable     => $trap_service_enable_real,
       hasstatus  => $trap_service_hasstatus,
       hasrestart => $trap_service_hasrestart,
-      require    => [ Package['snmpd'], File['var-net-snmp'], ],
+      require    => [
+        Package['snmpd'],
+        File['var-net-snmp'],
+      ],
       subscribe  => File['snmptrapd.conf'],
     }
   } elsif $::osfamily == 'Suse' {
@@ -491,6 +494,7 @@ class snmp (
       command => '/usr/bin/install -o 0 -g 0 -m0755 -p /usr/share/doc/packages/net-snmp/rc.snmptrapd /etc/init.d/snmptrapd',
       creates => '/etc/init.d/snmptrapd',
       require => Package['snmpd'],
+      before  => Service['snmptrapd'],
     }
 
     service { 'snmptrapd':
@@ -502,7 +506,6 @@ class snmp (
       require    => [
         Package['snmpd'],
         File['var-net-snmp'],
-        Exec['install /etc/init.d/snmptrapd'],
       ],
       subscribe  => File['snmptrapd.conf'],
     }
