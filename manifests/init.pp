@@ -476,19 +476,6 @@ class snmp (
       require => Package['snmpd'],
       notify  => Service['snmptrapd'],
     }
-
-    service { 'snmptrapd':
-      ensure     => $trap_service_ensure_real,
-      name       => $trap_service_name,
-      enable     => $trap_service_enable_real,
-      hasstatus  => $trap_service_hasstatus,
-      hasrestart => $trap_service_hasrestart,
-      require    => [
-        Package['snmpd'],
-        File['var-net-snmp'],
-      ],
-      subscribe  => File['snmptrapd.conf'],
-    }
   } elsif $::osfamily == 'Suse' {
     exec { 'install /etc/init.d/snmptrapd':
       command => '/usr/bin/install -o 0 -g 0 -m0755 -p /usr/share/doc/packages/net-snmp/rc.snmptrapd /etc/init.d/snmptrapd',
@@ -496,20 +483,9 @@ class snmp (
       require => Package['snmpd'],
       before  => Service['snmptrapd'],
     }
+  }
 
-    service { 'snmptrapd':
-      ensure     => $trap_service_ensure_real,
-      name       => $trap_service_name,
-      enable     => $trap_service_enable_real,
-      hasstatus  => $trap_service_hasstatus,
-      hasrestart => $trap_service_hasrestart,
-      require    => [
-        Package['snmpd'],
-        File['var-net-snmp'],
-      ],
-      subscribe  => File['snmptrapd.conf'],
-    }
-  } elsif $::osfamily == 'FreeBSD'  or $::osfamily == 'OpenBSD' {
+  unless $::osfamily == 'Debian' {
     service { 'snmptrapd':
       ensure     => $trap_service_ensure_real,
       name       => $trap_service_name,
