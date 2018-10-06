@@ -433,9 +433,11 @@ class snmp (
   }
 
   if $::osfamily == 'Suse' {
-    exec { 'install /etc/init.d/snmptrapd':
-      command => '/usr/bin/install -o 0 -g 0 -m0755 -p /usr/share/doc/packages/net-snmp/rc.snmptrapd /etc/init.d/snmptrapd',
-      creates => '/etc/init.d/snmptrapd',
+    file { '/etc/init.d/snmptrapd':
+      source  => '/usr/share/doc/packages/net-snmp/rc.snmptrapd',
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0755',
       require => Package['snmpd'],
       before  => Service['snmptrapd'],
     }
